@@ -1,0 +1,54 @@
+---
+seed: 2024
+
+num_workers: 4
+experiment_name: "bargain_net"
+
+dataset:
+  train_size: 0.9
+  sub_datasets:
+    - HAdobe5k
+    - HCOCO
+    - Hday2night
+    - HFlickr
+  root_dir: "./data/iharmony"
+  sub_dataset_train_csv_template: "{sub_dataset_name}_train.txt"
+  sub_dataset_test_csv_template: "{sub_dataset_name}_test.txt"
+  sub_dataset_composite_dir: composite_images
+  sub_dataset_mask_dir: masks
+  sub_dataset_real_images_dir: real_images
+
+model:
+  pl_class: src.integrated.BargainNetPl
+  num_channels: 4
+  ignore: 255
+  num_downs: 8
+  style_dim: 16
+
+optimizer:
+  type: torch.optim.AdamW
+  lr: 0.0001
+  weight_decay: 0.001
+
+loss:
+  triplet_loss:
+    margin: 0.1
+
+trainer:
+  devices: [0]
+  accelerator: "cuda"
+  max_epochs: 50
+  gradient_clip_val: 5.0
+  log_every_n_steps: 50
+  num_sanity_val_steps: 2
+  resume_from_checkpoint:
+
+train_parameters:
+  batch_size: 32
+
+val_parameters:
+  batch_size: 5
+
+output_root_dir: experiments
+load_sizes: [276, 286, 296]
+crop_size: 256
